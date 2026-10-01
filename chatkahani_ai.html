@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChatKahani AI</title>
+<style>
+:root{--ink:#1B2340;--ink2:#2A3560;--paper:#F4F6FB;--mint:#C6EBD9;--lav:#E4DDFB;--gold:#FFB627;--mute:#7B84A3}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--ink);color:var(--ink);display:flex;justify-content:center}
+#app{width:100%;max-width:480px;height:100dvh;background:var(--paper);display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;cursor:pointer;border:0}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.top{background:var(--ink);color:#fff;padding:28px 20px 22px}
+.top h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
+.top p{color:#AEB6D6;margin-top:4px;font-size:14px}
+.list{flex:1;overflow-y:auto;padding:14px 16px 24px;display:flex;flex-direction:column;gap:12px}
+.card{display:flex;gap:14px;text-align:left;background:#fff;border-radius:18px;padding:14px;box-shadow:0 1px 0 #DDE1EE;align-items:center;width:100%}
+.cover{flex:0 0 64px;height:84px;border-radius:12px;display:grid;place-items:center;font-size:30px}
+.card h3{font-size:16px;margin-bottom:3px}
+.card p{font-size:13px;color:var(--mute);line-height:1.35}
+.meta{margin-top:6px;font-size:12px;color:var(--ink2);font-weight:600}
+.bar{background:var(--ink);color:#fff;display:flex;align-items:center;gap:12px;padding:12px 14px}
+.back{background:none;color:#fff;font-size:22px;padding:4px 8px}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:var(--ink2)}
+.bar b{display:block;font-size:15px}
+.bar small{color:#9DE0B8;font-size:12px}
+.reset{margin-left:auto;background:var(--ink2);color:#fff;font-size:12px;padding:7px 11px;border-radius:99px}
+.chat{flex:1;overflow-y:auto;padding:16px 14px 10px;display:flex;flex-direction:column;gap:6px;background:radial-gradient(circle at 20% 10%,#E9EDFA 0,transparent 40%),var(--paper)}
+.row{display:flex;max-width:82%}
+.row.me{align-self:flex-end}
+.row.them{align-self:flex-start}
+.row.sys{align-self:center;max-width:90%}
+.b{padding:10px 14px;border-radius:18px;font-size:15px;line-height:1.4;animation:pop .18s ease-out;word-wrap:break-word;white-space:pre-wrap}
+.them .b{background:#fff;border-bottom-left-radius:5px;box-shadow:0 1px 0 #DDE1EE}
+.me .b{background:var(--mint);border-bottom-right-radius:5px}
+.sys .b{color:var(--mute);font-size:13px;font-style:italic;text-align:center;padding:4px}
+.dark .them .b{background:#2b1220;color:#ffd6dd}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+.typing{align-self:flex-start;background:#fff;padding:12px 16px;border-radius:18px;border-bottom-left-radius:5px;display:flex;gap:4px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--mute);animation:bl 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.chips{display:flex;gap:8px;padding:8px 14px 0;overflow-x:auto;background:#fff}
+.chip{background:var(--lav);color:var(--ink);padding:8px 12px;border-radius:99px;font-size:13px;font-weight:600;white-space:nowrap}
+.compose{background:#fff;display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));align-items:flex-end}
+textarea{flex:1;resize:none;border:1.5px solid #DDE1EE;border-radius:20px;padding:11px 14px;font:inherit;font-size:15px;max-height:110px;background:var(--paper)}
+.send{background:var(--ink);color:#fff;width:46px;height:46px;border-radius:50%;font-size:18px}
+.send:disabled{opacity:.4}
+.tabs{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto}
+.tab{padding:8px 14px;border-radius:99px;background:#E6E9F4;color:var(--ink2);font-size:13px;font-weight:600;white-space:nowrap}
+.tab.on{background:var(--ink);color:#fff}
+.create{display:flex;gap:14px;align-items:center;text-align:left;width:100%;background:var(--gold);color:var(--ink);border-radius:18px;padding:16px}
+.create span{font-size:30px;font-weight:800;width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--gold);display:grid;place-items:center;flex:0 0 44px;line-height:1}
+.create b{display:block;font-size:16px}
+.create small{font-size:12.5px;line-height:1.3;display:block;margin-top:2px}
+.empty{color:var(--mute);font-size:14px;text-align:center;padding:10px}
+.form{flex:1;overflow-y:auto;padding:8px 16px 28px;display:flex;flex-direction:column;gap:6px}
+.form label{font-size:13px;font-weight:700;color:var(--ink2);margin-top:12px}
+.form input,.form textarea{width:100%;border:1.5px solid #DDE1EE;border-radius:14px;padding:11px 13px;font:inherit;font-size:15px;background:#fff;max-height:none}
+.emo{display:flex;flex-wrap:wrap;gap:8px}
+.pick{width:44px;height:44px;border-radius:12px;background:#E6E9F4;font-size:22px}
+.pick.wide{width:auto;padding:0 14px;font-size:14px;font-weight:600;color:var(--ink2)}
+.pick.on{background:var(--ink);color:#fff;box-shadow:0 0 0 2px var(--gold)}
+.err{color:#C0304A;font-size:13px;min-height:18px;margin-top:8px}
+.tap{background:var(--ink);color:#fff;padding:15px;border-radius:14px;font-weight:700;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const CHARS=[
+{id:"prince",name:"Prince Aarav",emoji:"👑",tag:"Royal Romance",color:"#FFE3A8",avatar:"🤴",
+ blurb:"Rajasthan ke mahal ka yuvraj. Tumhe galti se shahi mehfil me bula liya gaya.",
+ opener:["sys","Tum ek photographer ho. Mahal me shoot ke liye aayi ho, par galat darwaze se andar chali gayi."],
+ first:"Ruko. Tum kaun ho? Is wing me kisi ko aane ki ijazat nahi hai.",
+ hints:["Sorry, main photographer hoon","Aap kaun?","Main bas raasta bhool gayi"],
+ prompt:`Tum Yuvraj Aarav Singh ho, ek jawaan rajasthani prince: sakht dikhne wale par andar se akela aur mazaakiya. User ek photographer hai jo galti se tumhare mahal ki private wing me aa gayi. Tum uske saath ek slow-burn romantic kahani chalate ho.`},
+{id:"didi",name:"Didi 💜",emoji:"👻",tag:"Horror",color:"#D7CBF5",avatar:"👩",dark:true,
+ blurb:"Raat 2:47 par behen ka message. Par wo to Pune me hai.",
+ opener:["sys","Raat 2:47. Tum ghar pe akele ho. Phone buzz hua."],
+ first:"Darwaza khol do. Main bahar khadi hoon.",
+ hints:["Didi tum Pune me ho na?","Kaun hai?","Papa ko call karun?"],
+ prompt:`Tum user ki badi behen ban kar message kar rahi cheez ho, jo asal me kuch daraavna hai. Dheere dheere dar badhao, chhoti chhoti sachchi jaisi details do (jaise light band kyun hai). Gore ya graphic hinsa nahi, bas suspense.`},
+{id:"rahul",name:"Rahul (Best Friend)",emoji:"😂",tag:"Comedy",color:"#C6EBD9",avatar:"🧢",
+ blurb:"Tumhara dost ek ajeeb plan lekar aaya hai: crush ko propose karne ka.",
+ opener:["sys","Rahul ka message aaya. Wo bahut excited lag raha hai."],
+ first:"Bhai bhai bhai, mere paas ek PLAN hai. Tu bas haan bol 😭",
+ hints:["Pehle plan bata","Nahi, pichhli baar fasa tha","Kis ko propose karna hai?"],
+ prompt:`Tum Rahul ho, user ka dramebaaz best friend. Tum ek bewakoof, mazedaar plan banate ho jo hamesha ulta pad jaata hai. Light comedy, funny situations.`},
+{id:"kabir",name:"Kabir (College Senior)",emoji:"🎸",tag:"Romance",color:"#FFD3DA",avatar:"🧑‍🎤",
+ blurb:"Topper, guitarist aur sabki crush. Aaj wo tumhe library me akela mila.",
+ opener:["sys","Library ka aakhri ghanta. Tum notes dhoondh rahi ho, aur Kabir ne tumhara pen utha liya."],
+ first:"Ye pen tumhara hai na? Teen din se tumhe dekh raha hoon, bolne ki himmat aaj hui 🙂",
+ hints:["Haan, mera hai","Teen din se? Kyun?","Pen wapas do"],
+ prompt:`Tum Kabir ho, 21 saal ka college senior: shaant, thoda sharmila, guitar bajata hai, dil ki baat dheere se kehta hai. User se tumhe sach me lagaav hai. College life ki sweet, slow-burn romantic kahani chalao.`},
+{id:"meera",name:"Meera (Padosan)",emoji:"🌸",tag:"Romance",color:"#FFE0F0",avatar:"👩‍🎨",
+ blurb:"Balcony ke us paar rehti hai. Roz chai ke saath tumhe dekhti hai.",
+ opener:["sys","Baarish ki shaam. Tumhari balcony se neeche ek chhatri gir gayi. Upar se Meera ne dekha."],
+ first:"Wo meri chhatri hai! Please mat todna 😅 Main aati hoon... ya tum hi aa jao chai pe?",
+ hints:["Chai ke liye aa raha hoon","Pehle chhatri to lo","Tum roz mujhe dekhti ho?"],
+ prompt:`Tum Meera ho, 24 saal ki painter aur user ki padosan: pyaari, thodi nautanki, baarish aur chai pasand hai. User ke liye dheere dheere pyaar jagta hai. Slice-of-life romantic kahani chalao, sweet aur halka-phulka.`},
+{id:"ishaan",name:"Dr. Ishaan",emoji:"🩺",tag:"Romance",color:"#CFE6FF",avatar:"🧑‍⚕️",
+ blurb:"Shehar ka sabse serious doctor, par tumhare saamne uski muskurahat chhup nahi paati.",
+ opener:["sys","Tumhari nayi job hospital ke NGO me hai. Pehle din Dr. Ishaan ne tumhe tour dene ka zimma liya."],
+ first:"Welcome. Rule number ek: yahan koi bhi kaam akele nahi hota. Chai peeti ho?",
+ hints:["Haan, aur rule number do?","Main bahut nervous hoon","Aap hamesha itne serious rehte ho?"],
+ prompt:`Tum Dr. Ishaan ho, 30 saal ke serious par dil ke naram doctor. Kaam me perfect, par pyaar ke maamle me anari. User tumhari nayi colleague hai. Workplace romance, slow-burn, respectful aur sweet.`}
+];
+const CUSTOM=[];
+const BASE=`Tum ek chat-story me character ho. Roman Hinglish (Hindi English mix, Roman script) me, WhatsApp style me baat karo. Hamesha apne character me raho, kabhi nahi bolo ki tum AI ho. Har jawab me 1 se 3 chhote messages do (har ek 1-2 line), unhe "|||" se alag karo. Kahani ko aage badhao, naya twist ya sawaal do taaki user ko jawab dene ka mann kare. User ke likhe par dhyan do aur uske hisaab se badlo. Koi graphic ya adult content nahi.`;
+
+const app=document.getElementById("app");
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const esc=s=>s.replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+
+let filter="Sab";
+function library(){
+  app.innerHTML="";
+  const tabs=el("div","tabs");
+  ["Sab","Romance","Horror","Comedy","Meri"].forEach(n=>{
+    const b=el("button","tab"+(n===filter?" on":""),n);
+    b.onclick=()=>{filter=n;library()};tabs.append(b);
+  });
+  const list=el("div","list");
+  const mk=el("button","create","<span>＋</span><div><b>Apni story banao</b><small>Apna character aur scene khud likho, phir roleplay shuru karo</small></div>");
+  mk.onclick=()=>createForm();
+  list.append(mk);
+  const all=[...CUSTOM,...CHARS].filter(c=>filter==="Sab"||(filter==="Meri"?c.custom:c.tag.includes(filter)));
+  if(filter==="Meri"&&!CUSTOM.length)list.append(el("p","empty","Abhi tumne koi story nahi banayi. Upar wale button se shuru karo."));
+  all.forEach(c=>{
+    const b=el("button","card",`<div class="cover" style="background:${c.color}">${c.emoji}</div>
+      <div><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><div class="meta">${esc(c.tag)} · Khud jawab likho</div></div>`);
+    b.onclick=()=>chat(c);list.append(b);
+  });
+  app.append(el("div","top","<h1>ChatKahani AI</h1><p>Jo man kare likho. Kahani tumhare jawab se badlegi.</p>"),tabs,list);
+}
+
+function createForm(){
+  app.innerHTML="";
+  const emojis=["💞","👑","🌹","🎸","🩺","🕶️","🌙","🔥","🐯","🎬","📚","🧑‍🚀"];
+  let emoji=emojis[0],tag="Romance";
+  const back=el("button","back","‹");back.setAttribute("aria-label","Wapas");back.onclick=library;
+  const bar=el("div","bar");bar.append(back,el("b","", "Apni story banao"));
+  const f=el("div","form");
+  const field=(label,id,ph,rows)=>`<label for="${id}">${label}</label>`+(rows?`<textarea id="${id}" rows="${rows}" placeholder="${ph}"></textarea>`:`<input id="${id}" placeholder="${ph}">`);
+  f.innerHTML=
+    field("Character ka naam","cn","jaise: Veer, Anaya, Rajkumar Dev")+
+    `<label>Emoji chuno</label><div class="emo" id="emo"></div>`+
+    `<label>Kisam ki kahani</label><div class="emo" id="tg"></div>`+
+    field("Character kaisa hai?","cp","jaise: 25 saal ka CEO, thoda ghamandi par dil ka accha, kam bolta hai",3)+
+    field("Tum kaun ho kahani me?","cu","jaise: Naya intern jo galti se uski meeting me ghus gaya",2)+
+    field("Scene kya hai?","cs","jaise: Raat ke 9 baje office khaali hai, lift atak gayi",3)+
+    field("Character ka pehla message","cf","jaise: Tum yahan kya kar rahi ho? (khaali chhodo to AI likhega)",2);
+  const emo=f.querySelector("#emo"),tg=f.querySelector("#tg");
+  emojis.forEach(e=>{const b=el("button","pick"+(e===emoji?" on":""),e);b.onclick=()=>{emoji=e;[...emo.children].forEach(x=>x.classList.toggle("on",x===b))};emo.append(b)});
+  ["Romance","Drama","Horror","Comedy","Fantasy"].forEach(t=>{const b=el("button","pick wide"+(t===tag?" on":""),t);b.onclick=()=>{tag=t;[...tg.children].forEach(x=>x.classList.toggle("on",x===b))};tg.append(b)});
+  const err=el("div","err");
+  const go=el("button","tap","Kahani shuru karo");
+  go.onclick=()=>{
+    const v=id=>f.querySelector("#"+id).value.trim();
+    if(!v("cn")||!v("cp")||!v("cs")){err.textContent="Naam, character ka swabhav aur scene zaroor likho.";return}
+    const you=v("cu")||"ek aam insaan";
+    const c={custom:true,id:"c"+Date.now(),name:v("cn"),emoji,avatar:emoji,tag,color:"#E4DDFB",
+      blurb:v("cs"),opener:["sys",v("cs")],first:v("cf"),
+      hints:["Hello","Aap kaun?","Yeh sab kya hai?"],
+      prompt:`Tum ${v("cn")} ho. Tumhara swabhav: ${v("cp")}. User ka kirdar: ${you}. Scene: ${v("cs")}. Kahani ki kisam: ${tag}. Roleplay me user ke saath kahani chalao, apne kirdar ke hisaab se.`+(v("cf")?"":" Pehla message tum khud scene ke hisaab se likhoge."),
+      dark:tag==="Horror",needFirst:!v("cf")};
+    CUSTOM.unshift(c);chat(c);
+  };
+  f.append(err,go);
+  app.append(bar,f);
+}
+
+function chat(c){
+  app.innerHTML="";
+  const starter={role:"user",content:"(Kahani shuru hui. Scene ke hisaab se apna pehla message bhejo.)"};
+  let history=c.first?[starter,{role:"assistant",content:c.first}]:[starter];
+  let busy=false;
+  const back=el("button","back","‹");back.setAttribute("aria-label","Wapas");back.onclick=library;
+  const reset=el("button","reset","Naya start");reset.onclick=()=>chat(c);
+  const bar=el("div","bar");
+  bar.append(back,el("div","avatar",c.avatar),el("div","",`<b>${c.name}</b><small>online</small>`),reset);
+  const box=el("div","chat"+(c.dark?" dark":""));
+  const chips=el("div","chips");
+  const ta=el("textarea");ta.rows=1;ta.placeholder="Apna jawab likho…";
+  const send=el("button","send","➤");send.setAttribute("aria-label","Bhejo");
+  const comp=el("div","compose");comp.append(ta,send);
+  app.append(bar,box,chips,comp);
+
+  const scroll=()=>box.scrollTo({top:box.scrollHeight,behavior:"smooth"});
+  const add=(who,text)=>{const r=el("div","row "+who);r.append(el("div","b",esc(text)));box.append(r);scroll()};
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+  c.hints.forEach(h=>{const b=el("button","chip",h);b.onclick=()=>{ta.value=h;go()};chips.append(b)});
+
+  add(c.opener[0],c.opener[1]);
+  if(c.first){setTimeout(()=>add("them",c.first),500)}
+  else{
+    busy=true;send.disabled=true;
+    const t0=el("div","typing","<span></span><span></span><span></span>");box.append(t0);
+    ask().then(async reply=>{
+      history.push({role:"assistant",content:reply});t0.remove();
+      const parts=reply.split("|||").map(s=>s.trim()).filter(Boolean);
+      for(let i=0;i<parts.length;i++){if(i>0)await wait(600);add("them",parts[i])}
+    }).catch(()=>{t0.remove();history=[starter];add("sys","Pehla message nahi aa paya. Neeche kuch likh kar shuru karo.")})
+    .finally(()=>{busy=false;send.disabled=false});
+  }
+
+  async function ask(){
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,
+        system:BASE+"\n\nCharacter: "+c.prompt,messages:history})});
+    const d=await r.json();
+    const txt=(d.content||[]).map(x=>x.type==="text"?x.text:"").join("").trim();
+    if(!txt)throw new Error("empty");
+    return txt;
+  }
+
+  async function go(){
+    const text=ta.value.trim();
+    if(!text||busy)return;
+    busy=true;send.disabled=true;chips.style.display="none";
+    ta.value="";ta.style.height="auto";
+    add("me",text);history.push({role:"user",content:text});
+    const t=el("div","typing","<span></span><span></span><span></span>");box.append(t);scroll();
+    try{
+      const reply=await ask();
+      history.push({role:"assistant",content:reply});
+      t.remove();
+      const parts=reply.split("|||").map(s=>s.trim()).filter(Boolean);
+      for(let i=0;i<parts.length;i++){
+        if(i>0){box.append(t);scroll();await wait(600+parts[i].length*12);t.remove()}
+        add("them",parts[i]);
+      }
+    }catch(e){
+      t.remove();history.pop();
+      add("sys","Jawab nahi aa paya. Internet check karo aur dobara bhejo.");
+      ta.value=text;
+    }
+    busy=false;send.disabled=false;ta.focus();
+  }
+
+  send.onclick=go;
+  ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();go()}});
+  ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(110,ta.scrollHeight)+"px"});
+}
+library();
+</script>
+</body>
+</html>
